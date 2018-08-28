@@ -1,0 +1,57 @@
+version: "3.5"
+
+volumes:
+  data: {}
+  config: {}
+
+services:
+  mongomaster:
+    image: ${REPO}/mongo
+    command: mongod --replSet "mongoRS" ${AUTH} ${MONGOSSL0}
+    ports:
+      - 27017:27017
+    volumes:
+      - data:/data/db
+      - config:/data/configdb
+    networks:
+      mongonet:
+        aliases:
+          - mongo0
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.mongo.role == master]
+
+  mongoslave1:
+    image: ${REPO}/mongo
+    command: mongod --replSet "mongoRS" ${AUTH} ${MONGOSSL1}
+    volumes:
+      - data:/data/db
+      - config:/data/configdb
+    networks:
+      mongonet:
+        aliases:
+          - mongo1
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.mongo.role == worker1]
+
+  mongoslave2:
+    image: ${REPO}/mongo
+    command: mongod --replSet "mongoRS" ${AUTH} ${MONGOSSL2}
+    volumes:
+      - data:/data/db
+      - config:/data/configdb
+    networks:
+      mongonet:
+        aliases:
+          - mongo2
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.mongo.role == worker2]
+
+networks:
+  mongonet:
+    attachable: true
