@@ -83,11 +83,8 @@ function configureRS () {
     genPwd
     USER_PWD=$passw
 
-    genPwd
-    AGENT_PWD=$passw
-
     mongo --host mongo0 \
-      --eval "var adminPwd = '$ADMIN_PWD', clusterAdminPwd = '$CLUSTER_ADMIN_PWD',  userPwd = '$USER_PWD',  agentPwd = '$AGENT_PWD', dbName = '$DB_NAME', userName = '$USER'" \
+      --eval "var adminPwd = '$ADMIN_PWD', clusterAdminPwd = '$CLUSTER_ADMIN_PWD',  userPwd = '$USER_PWD', dbName = '$DB_NAME', userName = '$USER'" \
      configure.js
 
     verifyResult $? "Failed to create users in a replica set."
@@ -96,7 +93,7 @@ function configureRS () {
     echo "Admin: admin/$ADMIN_PWD" | tee mongo.txt
     echo "Replica admin: replicaAdmin/$CLUSTER_ADMIN_PWD" | tee -a mongo.txt
     echo "$DB_NAME user: $USER/$USER_PWD" | tee -a mongo.txt
-    MONGO_URL="mongodb://tokengate:$USER_PWD@mongo0:27017,mongo1:27017,mongo2:27017/$DB_NAME?replicaSet=mongoRS"
+    MONGO_URL="mongodb://$USER:$USER_PWD@mongo0:27017,mongo1:27017,mongo2:27017/$DB_NAME?replicaSet=mongoRS"
     echo "MONGO_URL=$MONGO_URL"
     echo $MONGO_URL > /data/mongo-url.txt
   else
